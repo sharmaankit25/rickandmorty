@@ -2,22 +2,25 @@ import React, { Component } from "react";
 import { get_characters } from "../Api";
 import Details from "../components/Details";
 import Model from "../components/Model";
+import Pagination from "../components/Pagination";
 
 class Characters extends Component {
   state = {
     characters: [],
     info: {},
-    active_character: {}
+    active_character: {},
+    page: 1
   };
   async componentDidMount() {
-    let characters = await get_characters();
+    let characters = await get_characters(this.state.page);
     this.setState({
       characters: characters.results,
       info: characters.info
     });
   }
 
-  viewDetails = i => {
+  viewDetails = (e, i) => {
+    e.preventDefault();
     this.setState({
       active_character: this.state.characters[i]
     });
@@ -44,30 +47,40 @@ class Characters extends Component {
                 </div>
               </div>
               <div className="content">{character.type}</div>
-            </div>
-            <footer className="card-footer">
               <button
-                onClick={() => this.viewDetails(index)}
-                className="card-footer-item is-primary button"
+                onClick={e => this.viewDetails(e, index)}
+                className="is-primary button"
               >
                 Details
               </button>
-            </footer>
+            </div>
           </div>
         </div>
       );
     });
   };
 
+  next = async e => {
+    e.preventDefault();
+    let current_page = this.state.page;
+    let characters = await get_characters(current_page + 1);
+    this.setState({
+      page: current_page + 1,
+      characters: [...this.state.characters, ...characters.results],
+      active_character: {}
+    });
+  };
+
   render() {
     return (
       <React.Fragment>
-        <h2 className="title">Characters</h2>
+        <h2 className="title has-text-centered">Characters</h2>
         <div className="columns is-multiline">
           {this.state.characters.length
             ? this.renderCharacters()
             : "INITIATING APP ....."}
         </div>
+        <Pagination next={this.next} />
         <Model status={this.state.active_character.name ? true : false}>
           <Details details={this.state.active_character} />
         </Model>
