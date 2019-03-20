@@ -75,12 +75,16 @@ class Characters extends Component {
     return (
       <React.Fragment>
         <h2 className="title has-text-centered">Characters</h2>
+        <h4 className="subtitle">Total Characters : {this.state.info.count}</h4>
         <div className="columns is-multiline">
           {this.state.characters.length
             ? this.renderCharacters()
             : "INITIATING APP ....."}
         </div>
-        <Pagination next={this.next} />
+        <Pagination
+          next={this.next}
+          status={this.state.page >= this.state.info.pages ? false : true}
+        />
         <Model status={this.state.active_character.name ? true : false}>
           <Details details={this.state.active_character} />
         </Model>
